@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wind Sports Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Wind Sports Tracker</h1>
+        <p>Track your kite surfing, hydrofoiling, and more!</p>
+    </header>
+    <main>
+        <section id="summary">
+            <h2>Summary</h2>
+            <div id="summary-stats">
+                <p>Total Miles This Year: <span id="total-year">0</span></p>
+                <p>Total Miles This Month: <span id="total-month">0</span></p>
+                <p>Total Miles This Week: <span id="total-week">0</span></p>
+            </div>
+            <button id="download-csv">Download Data as CSV</button>
+        </section>
+        <section id="calendar">
+            <h2>Calendar</h2>
+            <div id="calendar-header">
+                <button id="prev-month"><</button>
+                <span id="current-month"></span>
+                <button id="next-month">></button>
+            </div>
+            <table id="calendar-table">
+                <thead>
+                    <tr>
+                        <th>Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body"></tbody>
+            </table>
+        </section>
+        <section id="day-view" style="display: none;">
+            <h2 id="day-title"></h2>
+            <p id="day-total-distance" style="font-weight: bold;"></p>
+            <button id="add-session">Add New Session</button>
+            <div id="sessions-list"></div>
+        </section>
+        <div id="modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h3 id="modal-title">Add/Edit Session</h3>
+                <form id="session-form">
+                    <label for="timeOfDay">Time of Day:</label>
+                    <input type="time" id="timeOfDay" required>
+                    
+                    <label for="windSpeed">Wind Speed (knots):</label>
+                    <input type="number" id="windSpeed" min="0" step="0.1" required>
+                    
+                    <label for="windDirection">Wind Direction:</label>
+                    <select id="windDirection" required>
+                        <option value="">Select</option>
+                        <option value="N">N</option>
+                        <option value="NE">NE</option>
+                        <option value="E">E</option>
+                        <option value="SE">SE</option>
+                        <option value="S">S</option>
+                        <option value="SW">SW</option>
+                        <option value="W">W</option>
+                        <option value="NW">NW</option>
+                    </select>
+                    
+                    <label for="tide">Tide:</label>
+                    <select id="tide" required>
+                        <option value="">Select</option>
+                        <option value="High">High</option>
+                        <option value="Low">Low</option>
+                        <option value="Rising">Rising</option>
+                        <option value="Falling">Falling</option>
+                    </select>
+                    
+                    <label for="equipment">Equipment Used (e.g., kite size):</label>
+                    <input type="text" id="equipment" required>
+                    
+                    <label for="distance">Distance Traveled (miles):</label>
+                    <input type="number" id="distance" min="0" step="0.1" required>
+                    
+                    <label for="notes">Notes (e.g., marine life):</label>
+                    <textarea id="notes"></textarea>
+                    
+                    <button type="submit">Save Session</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
