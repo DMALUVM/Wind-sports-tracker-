@@ -1201,6 +1201,385 @@
         URL.revokeObjectURL(url);
     }
 
+    // ─── Share System ─────────────────────────────────────────
+    let shareData = null; // holds current share context
+
+    function drawShareCard(type, payload) {
+        const canvas = $('#share-canvas');
+        const W = 540, H = 540;
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+
+        // Background
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#0a0e1a');
+        bgGrad.addColorStop(0.5, '#0f1628');
+        bgGrad.addColorStop(1, '#0a0e1a');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Subtle glow circle
+        const glow = ctx.createRadialGradient(W / 2, H * 0.35, 0, W / 2, H * 0.35, 260);
+        glow.addColorStop(0, 'rgba(0,180,255,0.06)');
+        glow.addColorStop(0.5, 'rgba(124,58,237,0.03)');
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, W, H);
+
+        // Border glow
+        ctx.strokeStyle = 'rgba(0,180,255,0.12)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(16, 16, W - 32, H - 32, 24);
+        ctx.stroke();
+
+        // Logo watermark top-center
+        drawLogoMini(ctx, W / 2, 46, 20);
+        ctx.fillStyle = 'rgba(232,236,244,0.5)';
+        ctx.font = '700 12px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('AERO', W / 2, 76);
+
+        if (type === 'session') {
+            drawSessionCard(ctx, W, H, payload);
+        } else if (type === 'stats') {
+            drawStatsCard(ctx, W, H);
+        }
+
+        // Footer branding
+        ctx.fillStyle = 'rgba(232,236,244,0.2)';
+        ctx.font = '500 10px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Tracked with AERO \u2022 Wind Sports Tracker', W / 2, H - 28);
+    }
+
+    function drawLogoMini(ctx, cx, cy, size) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        const s = size / 16;
+        // Teardrop
+        const grad = ctx.createLinearGradient(-12 * s, -14 * s, 12 * s, 14 * s);
+        grad.addColorStop(0, '#00b4ff');
+        grad.addColorStop(1, '#7c3aed');
+        ctx.fillStyle = grad;
+        ctx.globalAlpha = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(0, -14 * s);
+        ctx.bezierCurveTo(0, -14 * s, 12 * s, -8 * s, 12 * s, 2 * s);
+        ctx.bezierCurveTo(12 * s, 8.6 * s, 6.6 * s, 14 * s, 0, 14 * s);
+        ctx.bezierCurveTo(-6.6 * s, 14 * s, -12 * s, 8.6 * s, -12 * s, 2 * s);
+        ctx.bezierCurveTo(-12 * s, -8 * s, 0, -14 * s, 0, -14 * s);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        // Arrow
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2 * s;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-4 * s, 2 * s);
+        ctx.lineTo(0, -4 * s);
+        ctx.lineTo(4 * s, 2 * s);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -4 * s);
+        ctx.lineTo(0, 8 * s);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawSessionCard(ctx, W, H, session) {
+        const sport = SPORT_LABELS[session.sport] || session.sport;
+        const emoji = SPORT_EMOJIS[session.sport] || '';
+        const wl = windLabel();
+        const dl = distLabel();
+
+        // Sport badge & title
+        ctx.font = '28px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(emoji, W / 2, 118);
+
+        ctx.fillStyle = '#e8ecf4';
+        ctx.font = '800 26px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText(sport + ' Session', W / 2, 155);
+
+        ctx.fillStyle = 'rgba(232,236,244,0.45)';
+        ctx.font = '500 14px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText(formatDate(session.date), W / 2, 178);
+
+        // Rating stars
+        if (session.rating) {
+            const stars = '\u2605'.repeat(session.rating) + '\u2606'.repeat(5 - session.rating);
+            ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.fillStyle = '#ffd93d';
+            ctx.fillText(stars, W / 2, 205);
+        }
+
+        // Stats grid - 2x2 layout
+        const stats = [];
+        if (session.windSpeed) stats.push({ label: 'Wind', value: fmtWind(session.windSpeed) + (session.windGusts ? ' (G' + fmtWind(session.windGusts) + ')' : ''), unit: wl });
+        if (session.duration) stats.push({ label: 'Duration', value: durationLabel(session.duration), unit: '' });
+        if (session.distance) stats.push({ label: 'Distance', value: fmtDist(session.distance), unit: dl });
+        if (session.maxSpeed) stats.push({ label: 'Top Speed', value: fmtWind(session.maxSpeed), unit: wl });
+        if (session.jumpCount) stats.push({ label: 'Jumps', value: String(session.jumpCount), unit: '' });
+        if (session.maxJumpHeight) stats.push({ label: 'Max Air', value: String(session.maxJumpHeight), unit: 'm' });
+        if (session.windDirection) stats.push({ label: 'Direction', value: session.windDirection, unit: '' });
+
+        const gridTop = 235;
+        const cols = 2;
+        const cellW = 200;
+        const cellH = 80;
+        const gridLeft = (W - cols * cellW) / 2;
+
+        stats.slice(0, 6).forEach((st, i) => {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const cx = gridLeft + col * cellW + cellW / 2;
+            const cy = gridTop + row * cellH;
+
+            // Stat value
+            ctx.fillStyle = '#e8ecf4';
+            ctx.font = '800 28px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            const valText = st.unit ? st.value + ' ' + st.unit : st.value;
+            ctx.fillText(valText, cx, cy + 24);
+
+            // Stat label
+            ctx.fillStyle = 'rgba(232,236,244,0.35)';
+            ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.letterSpacing = '1px';
+            ctx.fillText(st.label.toUpperCase(), cx, cy + 44);
+            ctx.letterSpacing = '0px';
+        });
+
+        // Spot name if available
+        const spot = state.spots.find(sp => sp.id === session.spot);
+        if (spot) {
+            const spotY = gridTop + Math.ceil(Math.min(stats.length, 6) / cols) * cellH + 10;
+            ctx.fillStyle = 'rgba(0,180,255,0.5)';
+            ctx.font = '600 13px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('\u{1F4CD} ' + spot.name, W / 2, spotY);
+        }
+    }
+
+    function drawStatsCard(ctx, W, H) {
+        const sessions = state.sessions;
+        const name = state.settings.name || 'My';
+        const totalDist = sessions.reduce((a, s) => a + (s.distance || 0), 0);
+        const totalHours = sessions.reduce((a, s) => a + (s.duration || 0), 0) / 60;
+        const maxWind = Math.max(0, ...sessions.map(s => s.windSpeed || 0));
+        const maxSpeed = Math.max(0, ...sessions.map(s => s.maxSpeed || 0));
+        const streak = calcCurrentStreak(sessions);
+        const achieveCount = state.unlockedAchievements.size;
+        const totalAchieve = ACHIEVEMENTS.length;
+        const wl = windLabel();
+        const dl = distLabel();
+
+        // Title
+        ctx.fillStyle = '#e8ecf4';
+        ctx.font = '800 24px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(escapeHtml(name) + (name.endsWith('s') ? '\'' : '\'s') + ' Season', W / 2, 118);
+
+        // Season date range
+        if (sessions.length > 0) {
+            const sorted = [...sessions].sort((a, b) => a.date.localeCompare(b.date));
+            ctx.fillStyle = 'rgba(232,236,244,0.4)';
+            ctx.font = '500 13px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.fillText(formatDateShort(sorted[0].date) + ' \u2013 ' + formatDateShort(sorted[sorted.length - 1].date), W / 2, 144);
+        }
+
+        // Big number: total sessions
+        ctx.fillStyle = '#e8ecf4';
+        ctx.font = '900 56px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText(String(sessions.length), W / 2, 210);
+        ctx.fillStyle = 'rgba(232,236,244,0.35)';
+        ctx.font = '700 12px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText('SESSIONS', W / 2, 230);
+
+        // Divider line
+        const divGrad = ctx.createLinearGradient(W * 0.2, 0, W * 0.8, 0);
+        divGrad.addColorStop(0, 'transparent');
+        divGrad.addColorStop(0.5, 'rgba(0,180,255,0.3)');
+        divGrad.addColorStop(1, 'transparent');
+        ctx.strokeStyle = divGrad;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(W * 0.2, 248);
+        ctx.lineTo(W * 0.8, 248);
+        ctx.stroke();
+
+        // Stats grid - 3x2
+        const grid = [
+            { value: fmtDist(totalDist), unit: dl, label: 'DISTANCE' },
+            { value: totalHours.toFixed(1), unit: 'hrs', label: 'HOURS' },
+            { value: String(streak), unit: 'days', label: 'STREAK' },
+            { value: maxWind ? String(fmtWind(maxWind)) : '--', unit: wl, label: 'MAX WIND' },
+            { value: maxSpeed ? String(fmtWind(maxSpeed)) : '--', unit: wl, label: 'TOP SPEED' },
+            { value: achieveCount + '/' + totalAchieve, unit: '', label: 'ACHIEVEMENTS' },
+        ];
+
+        const gTop = 272;
+        const gCols = 3;
+        const gCellW = (W - 80) / gCols;
+        const gCellH = 76;
+        const gLeft = 40;
+
+        grid.forEach((g, i) => {
+            const col = i % gCols;
+            const row = Math.floor(i / gCols);
+            const cx = gLeft + col * gCellW + gCellW / 2;
+            const cy = gTop + row * gCellH;
+
+            ctx.fillStyle = '#e8ecf4';
+            ctx.font = '800 22px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            const txt = g.unit ? g.value + ' ' + g.unit : g.value;
+            ctx.fillText(txt, cx, cy + 20);
+
+            ctx.fillStyle = 'rgba(232,236,244,0.3)';
+            ctx.font = '600 9px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.fillText(g.label, cx, cy + 38);
+        });
+
+        // Sport breakdown bar
+        const sportCounts = {};
+        sessions.forEach(s => { sportCounts[s.sport] = (sportCounts[s.sport] || 0) + 1; });
+        const sportColors = { kitesurf: '#00b4ff', wingfoil: '#00e6b4', windsurf: '#ffd93d', foilboard: '#ff6b6b' };
+        const barY = gTop + Math.ceil(grid.length / gCols) * gCellH + 15;
+        const barW = W - 120;
+        const barH = 8;
+        const barX = 60;
+
+        // Bar background
+        ctx.fillStyle = 'rgba(255,255,255,0.05)';
+        ctx.beginPath();
+        ctx.roundRect(barX, barY, barW, barH, 4);
+        ctx.fill();
+
+        // Stacked segments
+        let segX = barX;
+        const sportEntries = Object.entries(sportCounts).sort((a, b) => b[1] - a[1]);
+        sportEntries.forEach(([sport, count], idx) => {
+            const segW = (count / sessions.length) * barW;
+            ctx.fillStyle = sportColors[sport] || '#888';
+            ctx.beginPath();
+            if (idx === 0 && sportEntries.length === 1) {
+                ctx.roundRect(segX, barY, segW, barH, 4);
+            } else if (idx === 0) {
+                ctx.roundRect(segX, barY, segW + 2, barH, [4, 0, 0, 4]);
+            } else if (idx === sportEntries.length - 1) {
+                ctx.roundRect(segX, barY, segW, barH, [0, 4, 4, 0]);
+            } else {
+                ctx.fillRect(segX, barY, segW, barH);
+            }
+            ctx.fill();
+            segX += segW;
+        });
+
+        // Sport legend
+        const legY = barY + 28;
+        const legSpacing = 110;
+        const legStartX = (W - sportEntries.length * legSpacing) / 2 + legSpacing / 2;
+        sportEntries.forEach(([sport, count], i) => {
+            const lx = legStartX + i * legSpacing;
+            ctx.fillStyle = sportColors[sport] || '#888';
+            ctx.beginPath();
+            ctx.arc(lx - 28, legY, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(232,236,244,0.5)';
+            ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText((SPORT_LABELS[sport] || sport) + ' (' + count + ')', lx - 20, legY + 4);
+        });
+        ctx.textAlign = 'center';
+    }
+
+    function getShareText(type, payload) {
+        const wl = windLabel();
+        const dl = distLabel();
+        if (type === 'session') {
+            const s = payload;
+            const sport = SPORT_LABELS[s.sport] || s.sport;
+            const spot = state.spots.find(sp => sp.id === s.spot);
+            let text = sport + ' session';
+            if (spot) text += ' at ' + spot.name;
+            text += ' \u2022 ' + formatDate(s.date);
+            if (s.windSpeed) text += '\n\u{1F4A8} ' + fmtWind(s.windSpeed) + ' ' + wl + (s.windGusts ? ' (G' + fmtWind(s.windGusts) + ')' : '');
+            if (s.duration) text += '\n\u23F1\uFE0F ' + durationLabel(s.duration);
+            if (s.distance) text += '\n\u{1F4CF} ' + fmtDist(s.distance) + ' ' + dl;
+            if (s.maxSpeed) text += '\n\u{1F3CE}\uFE0F ' + fmtWind(s.maxSpeed) + ' ' + wl + ' top speed';
+            if (s.rating) text += '\n' + '\u2B50'.repeat(s.rating);
+            text += '\n\nTracked with AERO';
+            return text;
+        } else {
+            const sessions = state.sessions;
+            const name = state.settings.name;
+            const totalDist = sessions.reduce((a, x) => a + (x.distance || 0), 0);
+            const totalHours = sessions.reduce((a, x) => a + (x.duration || 0), 0) / 60;
+            let text = (name || 'My') + ' wind sports season \u{1F30A}';
+            text += '\n\n\u26A1 ' + sessions.length + ' sessions';
+            text += '\n\u{1F4CF} ' + fmtDist(totalDist) + ' ' + dl;
+            text += '\n\u23F3 ' + totalHours.toFixed(1) + ' hours';
+            text += '\n\u{1F3C6} ' + state.unlockedAchievements.size + '/' + ACHIEVEMENTS.length + ' achievements';
+            text += '\n\nTracked with AERO';
+            return text;
+        }
+    }
+
+    function openShareModal(type, payload) {
+        shareData = { type, payload };
+        $('#share-modal-title').textContent = type === 'session' ? 'Share Session' : 'Share My Stats';
+        drawShareCard(type, payload);
+        openModal('modal-share');
+    }
+
+    function shareNative() {
+        if (!shareData) return;
+        const canvas = $('#share-canvas');
+        canvas.toBlob(async (blob) => {
+            const text = getShareText(shareData.type, shareData.payload);
+            if (navigator.share && navigator.canShare) {
+                const file = new File([blob], 'aero-share.png', { type: 'image/png' });
+                const data = { text, files: [file] };
+                try {
+                    if (navigator.canShare(data)) {
+                        await navigator.share(data);
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name !== 'AbortError') {
+                        // Fallback to text-only share
+                        try { await navigator.share({ text }); return; } catch (_) { /* ignore */ }
+                    } else { return; }
+                }
+            }
+            // Fallback: copy text
+            shareCopyText();
+        }, 'image/png');
+    }
+
+    function shareCopyText() {
+        if (!shareData) return;
+        const text = getShareText(shareData.type, shareData.payload);
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard!', 'success');
+        }).catch(() => {
+            showToast('Could not copy text', 'error');
+        });
+    }
+
+    function shareDownload() {
+        const canvas = $('#share-canvas');
+        const link = document.createElement('a');
+        link.download = 'aero-' + (shareData.type === 'session' ? 'session' : 'stats') + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
     // ─── Wind Particles ─────────────────────────────────────
     function initWindParticles() {
         const canvas = $('#wind-particles');
@@ -1417,6 +1796,27 @@
                 }
             }
         });
+
+        // Share buttons
+        $('#btn-share-session').addEventListener('click', () => {
+            if (viewingSessionId) {
+                const session = state.sessions.find(s => s.id === viewingSessionId);
+                if (session) {
+                    closeModal('modal-session-detail');
+                    openShareModal('session', session);
+                }
+            }
+        });
+        $('#btn-share-stats').addEventListener('click', () => {
+            if (state.sessions.length === 0) {
+                showToast('Log some sessions first!', 'info');
+                return;
+            }
+            openShareModal('stats');
+        });
+        $('#btn-share-native').addEventListener('click', shareNative);
+        $('#btn-share-copy').addEventListener('click', shareCopyText);
+        $('#btn-share-download').addEventListener('click', shareDownload);
 
         // Session detail actions
         $('#btn-edit-session').addEventListener('click', () => {

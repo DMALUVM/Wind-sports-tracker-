@@ -191,6 +191,12 @@
                     </div>
                     <div id="achievements-preview" class="achievements-grid"></div>
                 </div>
+
+                <!-- Share Stats Card -->
+                <button class="glass-card share-stats-btn" id="btn-share-stats">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    <span>Share My Stats</span>
+                </button>
             </section>
 
             <!-- ==================== LOG SESSION VIEW ==================== -->
@@ -736,8 +742,41 @@
             </div>
             <div id="session-detail-content"></div>
             <div class="modal-actions">
+                <button class="text-btn" id="btn-share-session">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    Share
+                </button>
                 <button class="text-btn" id="btn-edit-session">Edit</button>
                 <button class="text-btn danger" id="btn-delete-session">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="modal-share" style="display:none">
+        <div class="modal glass-card wide">
+            <div class="modal-header">
+                <h3 id="share-modal-title">Share</h3>
+                <button class="icon-btn modal-close" data-modal="modal-share">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="share-preview-wrap">
+                <canvas id="share-canvas" width="540" height="540"></canvas>
+            </div>
+            <div class="share-actions">
+                <button class="btn-share-action" id="btn-share-native">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    Share
+                </button>
+                <button class="btn-share-action" id="btn-share-copy">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    Copy Text
+                </button>
+                <button class="btn-share-action" id="btn-share-download">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Save Image
+                </button>
             </div>
         </div>
     </div>
