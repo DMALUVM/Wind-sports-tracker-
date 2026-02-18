@@ -448,7 +448,7 @@
             const angle = (i * 45 - 90) * Math.PI / 180;
             const lx = center + Math.cos(angle) * (radius + 16);
             const ly = center + Math.sin(angle) * (radius + 16);
-            ctx.fillStyle = 'rgba(232,236,244,0.35)';
+            ctx.fillStyle = 'rgba(232,236,244,0.55)';
             ctx.fillText(dir, lx, ly);
         });
 
@@ -544,7 +544,7 @@
 
         // Y-axis labels
         ctx.font = '400 10px "JetBrains Mono", monospace';
-        ctx.fillStyle = 'rgba(232,236,244,0.3)';
+        ctx.fillStyle = 'rgba(232,236,244,0.5)';
         ctx.textAlign = 'right';
         for (let i = 0; i <= 4; i++) {
             const y = padding.top + chartH - (chartH * i / 4);
@@ -581,14 +581,14 @@
 
             // Value on top
             if (values[i] > 0) {
-                ctx.fillStyle = 'rgba(232,236,244,0.6)';
+                ctx.fillStyle = 'rgba(232,236,244,0.8)';
                 ctx.font = '500 10px "JetBrains Mono", monospace';
                 ctx.textAlign = 'center';
                 ctx.fillText(values[i].toFixed(chartMetric === 'sessions' ? 0 : 1), x, y - 6);
             }
 
             // Month label
-            ctx.fillStyle = 'rgba(232,236,244,0.35)';
+            ctx.fillStyle = 'rgba(232,236,244,0.55)';
             ctx.font = '500 10px "Inter", sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(m.label, x, h - 8);
@@ -1248,7 +1248,7 @@
         }
 
         // Footer branding
-        ctx.fillStyle = 'rgba(232,236,244,0.2)';
+        ctx.fillStyle = 'rgba(232,236,244,0.4)';
         ctx.font = '500 10px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Tracked with AERO \u2022 Wind Sports Tracker', W / 2, H - 28);
@@ -1347,7 +1347,7 @@
             ctx.fillText(valText, cx, cy + 24);
 
             // Stat label
-            ctx.fillStyle = 'rgba(232,236,244,0.35)';
+            ctx.fillStyle = 'rgba(232,236,244,0.55)';
             ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
             ctx.letterSpacing = '1px';
             ctx.fillText(st.label.toUpperCase(), cx, cy + 44);
@@ -1396,7 +1396,7 @@
         ctx.fillStyle = '#e8ecf4';
         ctx.font = '900 56px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.fillText(String(sessions.length), W / 2, 210);
-        ctx.fillStyle = 'rgba(232,236,244,0.35)';
+        ctx.fillStyle = 'rgba(232,236,244,0.55)';
         ctx.font = '700 12px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.fillText('SESSIONS', W / 2, 230);
 
@@ -1440,7 +1440,7 @@
             const txt = g.unit ? g.value + ' ' + g.unit : g.value;
             ctx.fillText(txt, cx, cy + 20);
 
-            ctx.fillStyle = 'rgba(232,236,244,0.3)';
+            ctx.fillStyle = 'rgba(232,236,244,0.5)';
             ctx.font = '600 9px -apple-system, BlinkMacSystemFont, sans-serif';
             ctx.fillText(g.label, cx, cy + 38);
         });
