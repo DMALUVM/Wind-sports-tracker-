@@ -1,20 +1,24 @@
 /* ============================================================
-   AERO - Supabase Configuration
-   Replace with your Supabase project credentials
+   AERO - Configuration
+   Supabase + App Store + Promo Codes
    ============================================================ */
 
 const AERO_CONFIG = {
     // Supabase
-    SUPABASE_URL: 'https://YOUR_PROJECT.supabase.co',
-    SUPABASE_ANON_KEY: 'YOUR_ANON_KEY',
-
-    // Stripe (for subscription management)
-    STRIPE_PUBLISHABLE_KEY: 'pk_live_YOUR_KEY',
-    STRIPE_PRICE_ID: 'price_YOUR_PRICE_ID',
+    SUPABASE_URL: 'https://mjebjyjpeetrbgvqrbom.supabase.co',
+    SUPABASE_ANON_KEY: 'sb_publishable_40_NzMX4-3kZvCuuudENlQ_RlGOtcNA',
 
     // Strava OAuth
     STRAVA_CLIENT_ID: '',
     STRAVA_REDIRECT_URI: '',
+
+    // Promo codes that grant Pro access (case-insensitive)
+    // These are checked locally first, then against the Supabase promo_codes table
+    PROMO_CODES: {
+        'BETA2026': { label: 'Beta Tester', expiresAt: '2027-01-01', maxUses: 50 },
+        'FOUNDER': { label: 'Founder Access', expiresAt: '2030-01-01', maxUses: 10 },
+        'AEROLAUNCH': { label: 'Launch Day', expiresAt: '2026-12-31', maxUses: 200 },
+    },
 
     // Subscription tiers
     TIERS: {
@@ -35,6 +39,7 @@ const AERO_CONFIG = {
                 'Unlimited sessions',
                 'Cloud sync across devices',
                 'Strava auto-import',
+                'Apple Health import',
                 'Advanced analytics & trends',
                 'Community spots',
                 'Share cards & achievements',

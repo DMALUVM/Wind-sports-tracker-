@@ -1965,6 +1965,21 @@
         getSessionCount: () => state.sessions.length,
     };
 
+    // Listen for GPX/FIT/TCX file imports
+    window.addEventListener('aero-file-import', (e) => {
+        const data = e.detail;
+        if (!data) return;
+        // Switch to the log view and pre-fill the form
+        navigateTo('log');
+        setTimeout(() => {
+            if (data.date) { const el = $('#session-date'); if (el) el.value = data.date; }
+            if (data.time) { const el = $('#session-time'); if (el) el.value = data.time; }
+            if (data.duration) { const el = $('#session-duration'); if (el) el.value = data.duration; }
+            if (data.distance) { const el = $('#session-distance'); if (el) el.value = data.distance; }
+            if (data.maxSpeed) { const el = $('#session-max-speed'); if (el) el.value = data.maxSpeed; }
+        }, 100);
+    });
+
     // Start
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

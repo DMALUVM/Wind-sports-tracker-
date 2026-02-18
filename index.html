@@ -806,9 +806,12 @@
                             <svg class="health-logo" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#FF2D55"/></svg>
                             <span class="setting-label">Apple Health</span>
                         </div>
-                        <span class="setting-desc">Import watch sessions (requires native app)</span>
+                        <span class="setting-desc">Import water sport sessions from your watch</span>
                     </div>
-                    <span class="coming-soon-badge">Coming Soon</span>
+                    <button class="connect-btn" id="btn-connect-health">
+                        <span class="connect-dot"></span>
+                        Connect
+                    </button>
                 </div>
                 <div class="setting-item integration-item">
                     <div class="setting-info">
@@ -1070,9 +1073,21 @@
             </ul>
 
             <button class="paywall-cta" id="btn-subscribe">
-                Start Pro &mdash; $1.99/mo
+                Subscribe &mdash; $1.99/mo
             </button>
-            <p class="paywall-legal">Cancel anytime. No commitment.</p>
+            <p class="paywall-legal">Available on the App Store. Cancel anytime.</p>
+
+            <div class="paywall-promo-section">
+                <p class="paywall-promo-label">Have a promo code?</p>
+                <div class="promo-input-row">
+                    <input type="text" id="promo-input" class="promo-input" placeholder="Enter code" autocomplete="off" spellcheck="false" autocapitalize="characters">
+                    <button class="promo-redeem-btn" id="btn-redeem-promo">
+                        <span class="btn-text">Redeem</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </div>
+                <p class="promo-message" id="promo-message"></p>
+            </div>
         </div>
     </div>
 

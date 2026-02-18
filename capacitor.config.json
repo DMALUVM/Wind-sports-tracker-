@@ -1,0 +1,22 @@
+{
+  "appId": "com.aero.windsportstracker",
+  "appName": "AERO",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHealth": {
+      "readPermissions": ["workouts", "heart_rate", "distance_swimming", "active_energy_burned"],
+      "writePermissions": ["workouts"]
+    }
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#0a0e1a",
+    "preferredContentMode": "mobile"
+  },
+  "android": {
+    "backgroundColor": "#0a0e1a"
+  }
+}
