@@ -1,0 +1,7 @@
+node_modules/
+ios/
+android/
+.DS_Store
+*.xcworkspace
+*.xcuserdata
+Pods/
