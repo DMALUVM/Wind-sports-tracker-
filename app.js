@@ -1979,9 +1979,48 @@
         }
     }
 
-    // Expose session count check for paywall integration
+    // Expose API for auth.js / integration modules
     window.AeroApp = {
         getSessionCount: () => state.sessions.length,
+        importSessions(sessions) {
+            let added = 0;
+            for (const s of sessions) {
+                // Skip duplicates by matching date + time + duration
+                const dup = state.sessions.find(x =>
+                    x.date === s.date && x.time === s.time && x.duration === s.duration
+                );
+                if (dup) continue;
+                state.sessions.push({
+                    id: uuid(),
+                    sport: s.sport || 'kitesurf',
+                    date: s.date,
+                    time: s.time || '',
+                    duration: s.duration || 0,
+                    windSpeed: s.windSpeed || 0,
+                    windGusts: s.windGusts || 0,
+                    windDirection: s.windDirection || '',
+                    tide: s.tide || '',
+                    waterState: s.waterState || '',
+                    distance: s.distance || 0,
+                    maxSpeed: s.maxSpeed || 0,
+                    jumpCount: s.jumpCount || 0,
+                    maxJumpHeight: s.maxJumpHeight || 0,
+                    maxAirtime: s.maxAirtime || 0,
+                    spot: s.spot || '',
+                    equipment: s.equipment || '',
+                    rating: s.rating || 0,
+                    notes: s.notes || '',
+                    source: s.source || 'Apple Health',
+                });
+                added++;
+            }
+            if (added > 0) {
+                save();
+                checkAchievements();
+                renderDashboard();
+            }
+            return added;
+        },
     };
 
     // Listen for GPX/FIT/TCX file imports

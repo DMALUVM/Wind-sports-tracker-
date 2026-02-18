@@ -749,19 +749,44 @@ const AeroAuth = (function () {
         // HealthKit button
         const healthBtn = document.getElementById('btn-connect-health');
         if (healthBtn) {
+            // Restore connected state
+            if (localStorage.getItem('aero_healthkit_connected')) {
+                healthBtn.classList.add('connected');
+                healthBtn.innerHTML = '<span class="connect-dot"></span>Import';
+            }
             healthBtn.addEventListener('click', async () => {
                 if (!isHealthKitAvailable()) {
-                    showToast('Apple Health requires the native iOS app (coming soon)', 'info');
+                    showToast('Apple Health requires the native iOS app', 'info');
                     return;
                 }
-                const { error } = await requestHealthKitPermissions();
-                if (error) {
-                    showToast(error, 'error');
-                    return;
+                const connected = localStorage.getItem('aero_healthkit_connected');
+                if (!connected) {
+                    // First tap — request permissions
+                    const { error } = await requestHealthKitPermissions();
+                    if (error) {
+                        showToast(error, 'error');
+                        return;
+                    }
+                    localStorage.setItem('aero_healthkit_connected', '1');
+                    healthBtn.classList.add('connected');
+                    healthBtn.innerHTML = '<span class="connect-dot"></span>Import';
+                    showToast('Apple Health connected! Tap Import to pull sessions.', 'success');
+                } else {
+                    // Already connected — import sessions
+                    healthBtn.disabled = true;
+                    healthBtn.textContent = 'Importing…';
+                    const result = await importHealthKitSessions(90);
+                    if (result.error) {
+                        showToast(result.error, 'error');
+                    } else if (result.sessions.length === 0) {
+                        showToast('No new sessions found in Apple Health', 'info');
+                    } else if (window.AeroApp && window.AeroApp.importSessions) {
+                        const added = window.AeroApp.importSessions(result.sessions);
+                        showToast(added > 0 ? `Imported ${added} session${added > 1 ? 's' : ''} from Apple Health!` : 'All sessions already imported', added > 0 ? 'success' : 'info');
+                    }
+                    healthBtn.disabled = false;
+                    healthBtn.innerHTML = '<span class="connect-dot"></span>Import';
                 }
-                showToast('Apple Health connected!', 'success');
-                healthBtn.classList.add('connected');
-                healthBtn.innerHTML = '<span class="connect-dot"></span>Connected';
             });
         }
 
