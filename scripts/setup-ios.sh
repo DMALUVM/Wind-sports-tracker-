@@ -64,8 +64,6 @@ cat > "$ENTITLEMENTS" << 'ENTITLEMENTS_EOF'
 	<true/>
 	<key>com.apple.developer.healthkit.access</key>
 	<array/>
-	<key>com.apple.developer.healthkit.background-delivery</key>
-	<false/>
 </dict>
 </plist>
 ENTITLEMENTS_EOF
