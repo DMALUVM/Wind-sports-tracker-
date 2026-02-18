@@ -4,9 +4,9 @@
   "description": "Track kitesurfing, wing foiling, windsurfing & hydrofoil sessions",
   "private": true,
   "scripts": {
-    "cap:sync": "npx cap sync",
-    "cap:ios": "npx cap open ios",
-    "cap:build": "npx cap sync && npx cap open ios"
+    "build": "rm -rf www && mkdir -p www/icons && cp index.html styles.css app.js auth.js supabase-config.js sw.js manifest.json www/ && cp icons/* www/icons/",
+    "cap:sync": "npm run build && npx cap sync ios",
+    "cap:ios": "npm run build && npx cap sync ios && npx cap open ios"
   },
   "dependencies": {
     "@capacitor/app": "^6.0.0",

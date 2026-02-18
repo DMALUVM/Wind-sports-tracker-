@@ -1,7 +1,7 @@
 {
   "appId": "com.aero.windsportstracker",
   "appName": "AERO",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https"
   },
