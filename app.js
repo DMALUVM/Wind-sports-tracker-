@@ -1959,16 +1959,23 @@
             showOnboarding();
         }
 
-        // Hide native splash screen once the web app is ready
+        // Hide splash screens (both native and HTML overlay)
         hideSplashScreen();
     }
 
     async function hideSplashScreen() {
+        // Hide native Capacitor splash
         try {
             const { SplashScreen } = await import('@capacitor/splash-screen');
-            await SplashScreen.hide({ fadeOutDuration: 500 });
+            await SplashScreen.hide({ fadeOutDuration: 300 });
         } catch (_) {
             // Not running in Capacitor native shell — ignore
+        }
+        // Fade out and remove the HTML splash overlay
+        const splash = document.getElementById('app-splash');
+        if (splash) {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.remove(), 500);
         }
     }
 

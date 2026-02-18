@@ -7,14 +7,10 @@
   },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 1500,
+      "launchShowDuration": 0,
       "launchAutoHide": true,
-      "launchFadeOutDuration": 500,
       "backgroundColor": "#0a0e1a",
-      "showSpinner": false,
-      "androidScaleType": "CENTER_INSIDE",
-      "splashFullScreen": false,
-      "splashImmersive": false
+      "showSpinner": false
     },
     "CapacitorHealthkit": {
       "readPermissions": ["activity", "calories", "distance", "duration", "weight"],
