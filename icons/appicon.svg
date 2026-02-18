@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1529"/>
+      <stop offset="50%" style="stop-color:#0a0e1a"/>
+      <stop offset="100%" style="stop-color:#060a14"/>
+    </linearGradient>
+
+    <!-- Accent gradient - cyan to blue -->
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="50%" style="stop-color:#0099ff"/>
+      <stop offset="100%" style="stop-color:#0066dd"/>
+    </linearGradient>
+
+    <!-- Wind lines gradient -->
+    <linearGradient id="wind" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0"/>
+      <stop offset="30%" style="stop-color:#00d4ff;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#0099ff;stop-opacity:1"/>
+    </linearGradient>
+
+    <linearGradient id="wind2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0"/>
+      <stop offset="40%" style="stop-color:#00bbff;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#0088ee;stop-opacity:0.8"/>
+    </linearGradient>
+
+    <linearGradient id="wind3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#00aaff;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#0077cc;stop-opacity:0.5"/>
+    </linearGradient>
+
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Subtle inner glow on background -->
+    <radialGradient id="innerglow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#0099ff;stop-opacity:0.08"/>
+      <stop offset="100%" style="stop-color:#0099ff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- Subtle radial glow behind the letter -->
+  <rect width="1024" height="1024" fill="url(#innerglow)"/>
+
+  <!-- Wind lines - curved flowing lines suggesting wind/motion -->
+  <!-- Top wind line -->
+  <path d="M 160 310 Q 350 280, 500 300 Q 650 320, 820 270"
+        stroke="url(#wind3)" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Middle wind lines -->
+  <path d="M 120 390 Q 300 350, 480 375 Q 660 400, 860 340"
+        stroke="url(#wind2)" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <path d="M 140 460 Q 340 420, 520 445 Q 700 470, 880 410"
+        stroke="url(#wind)" stroke-width="5" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+
+  <!-- Bottom wind lines -->
+  <path d="M 150 620 Q 340 590, 510 608 Q 680 626, 870 580"
+        stroke="url(#wind)" stroke-width="5" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+
+  <path d="M 170 690 Q 360 660, 530 678 Q 700 696, 880 650"
+        stroke="url(#wind2)" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <path d="M 190 760 Q 370 735, 540 748 Q 710 761, 890 720"
+        stroke="url(#wind3)" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Stylized "A" letterform - modern geometric -->
+  <g filter="url(#softglow)">
+    <!-- Left leg of A -->
+    <path d="M 310 740 L 480 280 L 512 280"
+          stroke="url(#accent)" stroke-width="48" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Right leg of A -->
+    <path d="M 512 280 L 544 280 L 714 740"
+          stroke="url(#accent)" stroke-width="48" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Crossbar of A - slightly angled for dynamism -->
+    <path d="M 390 560 L 634 540"
+          stroke="url(#accent)" stroke-width="36" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Small accent dot / wind indicator -->
+  <circle cx="512" cy="220" r="12" fill="url(#accent)" filter="url(#glow)" opacity="0.9"/>
+
+</svg>
