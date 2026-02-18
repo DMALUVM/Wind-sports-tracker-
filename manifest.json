@@ -1,0 +1,21 @@
+{
+  "name": "AERO - Wind Sports Tracker",
+  "short_name": "AERO",
+  "description": "Track your kitesurfing, wing foiling, windsurfing & hydrofoil sessions",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#0a0e1a",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
