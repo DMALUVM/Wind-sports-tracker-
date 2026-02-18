@@ -18,6 +18,99 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <!-- ==================== AUTH SCREEN ==================== -->
+    <div class="auth-screen" id="auth-screen" style="display:none">
+        <div class="auth-ambient">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+        </div>
+        <div class="auth-card">
+            <svg class="auth-logo" viewBox="0 0 32 32" fill="none">
+                <path d="M16 2C16 2 28 8 28 18C28 24.627 22.627 30 16 30C9.373 30 4 24.627 4 18C4 8 16 2 16 2Z" fill="url(#authGrad)" opacity="0.9"/>
+                <path d="M16 6C16 6 8 14 8 20C8 24.418 11.582 28 16 28" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none"/>
+                <path d="M16 6C16 6 24 14 24 20C24 24.418 20.418 28 16 28" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none"/>
+                <path d="M12 16L16 10L20 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M16 10V24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <defs>
+                    <linearGradient id="authGrad" x1="4" y1="2" x2="28" y2="30">
+                        <stop offset="0%" stop-color="#00b4ff"/>
+                        <stop offset="100%" stop-color="#7c3aed"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1 class="auth-title">AERO</h1>
+            <p class="auth-tagline">Track every session. Own every wave.</p>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-mode="signin">Sign In</button>
+                <button class="auth-tab" data-mode="signup">Create Account</button>
+            </div>
+
+            <!-- Sign In Form -->
+            <form class="auth-form" id="form-signin">
+                <div class="auth-field">
+                    <label for="signin-email">Email</label>
+                    <input type="email" id="signin-email" placeholder="rider@example.com" required autocomplete="email">
+                </div>
+                <div class="auth-field">
+                    <label for="signin-password">Password</label>
+                    <input type="password" id="signin-password" placeholder="Your password" required autocomplete="current-password">
+                </div>
+                <div class="auth-error" style="display:none"></div>
+                <div class="auth-success" style="display:none"></div>
+                <button type="submit" class="auth-submit-btn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader"></span>
+                </button>
+                <a href="#" class="auth-forgot-link">Forgot password?</a>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form class="auth-form" id="form-signup" style="display:none">
+                <div class="auth-field">
+                    <label for="signup-name">Name</label>
+                    <input type="text" id="signup-name" placeholder="Your rider name" autocomplete="name">
+                </div>
+                <div class="auth-field">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="rider@example.com" required autocomplete="email">
+                </div>
+                <div class="auth-field">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Min 6 characters" required minlength="6" autocomplete="new-password">
+                </div>
+                <div class="auth-error" style="display:none"></div>
+                <div class="auth-success" style="display:none"></div>
+                <button type="submit" class="auth-submit-btn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loader"></span>
+                </button>
+            </form>
+
+            <!-- Password Reset Form -->
+            <form class="auth-form" id="form-reset" style="display:none">
+                <p class="auth-reset-desc">Enter your email and we'll send you a reset link.</p>
+                <div class="auth-field">
+                    <label for="reset-email">Email</label>
+                    <input type="email" id="reset-email" placeholder="rider@example.com" required autocomplete="email">
+                </div>
+                <div class="auth-error" style="display:none"></div>
+                <div class="auth-success" style="display:none"></div>
+                <button type="submit" class="auth-submit-btn">
+                    <span class="btn-text">Send Reset Link</span>
+                    <span class="btn-loader"></span>
+                </button>
+                <a href="#" class="auth-back-link">Back to sign in</a>
+            </form>
+
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+            <button class="auth-skip-btn" id="auth-skip-btn">Continue without an account</button>
+            <p class="auth-footer-note">Free accounts can log up to 15 sessions</p>
+        </div>
+    </div>
     <!-- Ambient Background -->
     <div class="ambient-bg">
         <div class="gradient-orb orb-1"></div>
@@ -668,6 +761,85 @@
                 </button>
             </div>
             <div class="settings-list">
+
+                <!-- Account Section -->
+                <div class="settings-section-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Account
+                </div>
+                <div class="setting-item" id="setting-account-info">
+                    <div class="setting-info">
+                        <span class="setting-label" id="setting-account-email">Not signed in</span>
+                        <span class="setting-desc" id="setting-account-tier">Local mode</span>
+                    </div>
+                    <button class="text-btn" id="btn-signout" style="display:none">Sign Out</button>
+                </div>
+                <div class="setting-item" id="setting-upgrade-row">
+                    <div class="setting-info">
+                        <span class="setting-label">Subscription</span>
+                        <span class="setting-desc" id="setting-sub-status">Free plan</span>
+                    </div>
+                    <button class="upgrade-pill" id="btn-upgrade">Upgrade to Pro</button>
+                </div>
+
+                <!-- Integrations Section -->
+                <div class="settings-section-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    Integrations
+                </div>
+                <div class="setting-item integration-item">
+                    <div class="setting-info">
+                        <div class="integration-brand">
+                            <svg class="strava-logo" viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" fill="#FC4C02"/></svg>
+                            <span class="setting-label">Strava</span>
+                        </div>
+                        <span class="setting-desc">Auto-import kitesurf & windsurf sessions</span>
+                    </div>
+                    <button class="connect-btn" id="btn-connect-strava">
+                        <span class="connect-dot"></span>
+                        Connect
+                    </button>
+                </div>
+                <div class="setting-item integration-item">
+                    <div class="setting-info">
+                        <div class="integration-brand">
+                            <svg class="health-logo" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#FF2D55"/></svg>
+                            <span class="setting-label">Apple Health</span>
+                        </div>
+                        <span class="setting-desc">Import watch sessions (requires native app)</span>
+                    </div>
+                    <span class="coming-soon-badge">Coming Soon</span>
+                </div>
+                <div class="setting-item integration-item">
+                    <div class="setting-info">
+                        <div class="integration-brand">
+                            <svg class="garmin-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                            <span class="setting-label">Garmin Connect</span>
+                        </div>
+                        <span class="setting-desc">Sync activities from your Garmin watch</span>
+                    </div>
+                    <span class="coming-soon-badge">Coming Soon</span>
+                </div>
+                <div class="setting-item integration-item">
+                    <div class="setting-info">
+                        <div class="integration-brand">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            <span class="setting-label">Import GPX / FIT</span>
+                        </div>
+                        <span class="setting-desc">Import session files from any device</span>
+                    </div>
+                    <label class="connect-btn" for="import-gpx-file">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload
+                    </label>
+                    <input type="file" id="import-gpx-file" accept=".gpx,.fit,.tcx" style="display:none">
+                </div>
+
+                <!-- Preferences Section -->
+                <div class="settings-section-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Preferences
+                </div>
                 <div class="setting-item">
                     <div class="setting-info">
                         <span class="setting-label">Distance Unit</span>
@@ -697,6 +869,12 @@
                         <span class="setting-desc">Personalize your dashboard</span>
                     </div>
                     <input type="text" id="setting-name" class="form-input inline-input" placeholder="Rider name">
+                </div>
+
+                <!-- Data Section -->
+                <div class="settings-section-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Data
                 </div>
                 <div class="setting-item">
                     <div class="setting-info">
@@ -844,9 +1022,71 @@
         </div>
     </div>
 
+    <!-- ==================== PAYWALL MODAL ==================== -->
+    <div class="modal-overlay paywall-overlay" id="modal-paywall" style="display:none">
+        <div class="paywall-card">
+            <button class="icon-btn modal-close" data-modal="modal-paywall">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+
+            <div class="paywall-badge">PRO</div>
+            <h2 class="paywall-title">Unlock the Full Experience</h2>
+            <p class="paywall-subtitle">Unlimited sessions, cloud sync, and integrations</p>
+
+            <div class="paywall-price">
+                <span class="paywall-amount">$1.99</span>
+                <span class="paywall-period">/month</span>
+            </div>
+
+            <ul class="paywall-features">
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Unlimited session logging</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Sync across all your devices</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Strava auto-import</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>GPX & FIT file import</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Advanced analytics & trends</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Community spot discovery</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Share cards & all achievements</span>
+                </li>
+            </ul>
+
+            <button class="paywall-cta" id="btn-subscribe">
+                Start Pro &mdash; $1.99/mo
+            </button>
+            <p class="paywall-legal">Cancel anytime. No commitment.</p>
+        </div>
+    </div>
+
     <!-- Toast notifications -->
     <div id="toast-container" class="toast-container"></div>
 
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="auth.js"></script>
     <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>

@@ -1939,11 +1939,31 @@
         initWindParticles();
         navigateTo('dashboard');
         checkAchievements();
+
+        // Initialize auth system
+        if (typeof AeroAuth !== 'undefined') {
+            AeroAuth.init();
+            AeroAuth.bindAuthEvents();
+
+            // If Supabase is not configured or user skipped auth, show app directly
+            if (!AeroAuth.isConfigured() || localStorage.getItem('aero_skipped_auth')) {
+                const authScreen = document.getElementById('auth-screen');
+                const appShell = document.getElementById('app');
+                if (authScreen) authScreen.style.display = 'none';
+                if (appShell) appShell.style.display = 'flex';
+            }
+        }
+
         // Show onboarding for first-time users
         if (!localStorage.getItem('aero_onboarded')) {
             showOnboarding();
         }
     }
+
+    // Expose session count check for paywall integration
+    window.AeroApp = {
+        getSessionCount: () => state.sessions.length,
+    };
 
     // Start
     if (document.readyState === 'loading') {

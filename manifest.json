@@ -1,21 +1,44 @@
 {
   "name": "AERO - Wind Sports Tracker",
   "short_name": "AERO",
-  "description": "Track your kitesurfing, wing foiling, windsurfing & hydrofoil sessions",
+  "description": "Track kitesurfing, wing foiling, windsurfing & hydrofoil sessions with cloud sync, Strava integration, and detailed analytics.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0a0e1a",
   "theme_color": "#0a0e1a",
+  "categories": ["sports", "fitness", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
     {
       "src": "icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Log Session",
+      "short_name": "Log",
+      "description": "Log a new wind sports session",
+      "url": "/?action=log",
+      "icons": []
     }
   ]
 }
