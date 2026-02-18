@@ -68,6 +68,10 @@ cat > "$ENTITLEMENTS" << 'ENTITLEMENTS_EOF'
 </plist>
 ENTITLEMENTS_EOF
 
+# Safety: explicitly remove background-delivery if the HealthKit plugin injected it
+/usr/libexec/PlistBuddy -c "Delete :com.apple.developer.healthkit.background-delivery" "$ENTITLEMENTS" 2>/dev/null || true
+echo "    ✓ Ensured no background-delivery entitlement"
+
 # ──────────────────────────────────────────────────────────
 # 5. Set Background Modes (for HealthKit if needed later)
 # ──────────────────────────────────────────────────────────
@@ -93,7 +97,20 @@ if [ -f "$PBXPROJ" ]; then
     else
         echo "    ✓ Entitlements already linked"
     fi
+
+    # Remove HealthKit background delivery from SystemCapabilities if plugin added it
+    if grep -q "com.apple.BackgroundModes" "$PBXPROJ"; then
+        sed -i '' '/com.apple.BackgroundModes/,/};/d' "$PBXPROJ"
+        echo "    ✓ Removed BackgroundModes from SystemCapabilities"
+    fi
 fi
+
+# ──────────────────────────────────────────────────────────
+# 8. Clean Xcode derived data (prevents stale entitlements cache)
+# ──────────────────────────────────────────────────────────
+echo "  → Cleaning Xcode derived data for this project..."
+rm -rf ~/Library/Developer/Xcode/DerivedData/App-* 2>/dev/null || true
+echo "    ✓ Derived data cleaned"
 
 echo ""
 echo "✅ iOS project configured for TestFlight!"
@@ -102,8 +119,10 @@ echo "Next steps in Xcode:"
 echo "  1. Open ios/App/App.xcworkspace"
 echo "  2. Select the 'App' target → Signing & Capabilities"
 echo "  3. Select your Team / Apple Developer account"
-echo "  4. Verify 'HealthKit' appears under Capabilities"
+echo "  4. If HealthKit shows 'Background Delivery' checked, UNCHECK it"
+echo "  5. Verify 'HealthKit' appears under Capabilities"
 echo "     (If not: + Capability → search 'HealthKit' → add it)"
-echo "  5. Product → Archive"
-echo "  6. Distribute App → TestFlight (App Store Connect)"
+echo "  6. Product → Clean Build Folder (Cmd+Shift+K)"
+echo "  7. Product → Archive"
+echo "  8. Distribute App → TestFlight (App Store Connect)"
 echo ""
