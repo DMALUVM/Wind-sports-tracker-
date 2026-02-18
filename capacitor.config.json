@@ -6,9 +6,19 @@
     "androidScheme": "https"
   },
   "plugins": {
-    "CapacitorHealth": {
-      "readPermissions": ["workouts", "heart_rate", "distance_swimming", "active_energy_burned"],
-      "writePermissions": ["workouts"]
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "launchFadeOutDuration": 500,
+      "backgroundColor": "#0a0e1a",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_INSIDE",
+      "splashFullScreen": false,
+      "splashImmersive": false
+    },
+    "CapacitorHealthkit": {
+      "readPermissions": ["activity", "calories", "distance", "duration", "weight"],
+      "writePermissions": []
     }
   },
   "ios": {

@@ -479,11 +479,17 @@ const AeroAuth = (function () {
             return { error: 'Apple Health requires the native iOS app.' };
         }
         try {
-            const { CapacitorHealth } = await import('@anthropic/capacitor-health');
-            const granted = await CapacitorHealth.requestAuthorization({
-                readPermissions: ['workouts', 'heart_rate', 'distance', 'calories'],
+            const { CapacitorHealthkit } = await import('@perfood/capacitor-healthkit');
+            const available = await CapacitorHealthkit.isAvailable();
+            if (!available) {
+                return { error: 'HealthKit is not available on this device.' };
+            }
+            await CapacitorHealthkit.requestAuthorization({
+                all: [''],
+                read: ['activity', 'calories', 'distance', 'duration', 'weight'],
+                write: [''],
             });
-            return { granted };
+            return { granted: true };
         } catch (e) {
             return { error: e.message || 'HealthKit not available.' };
         }
@@ -494,18 +500,21 @@ const AeroAuth = (function () {
             return { error: 'Apple Health requires the native iOS app.', sessions: [] };
         }
         try {
-            const { CapacitorHealth } = await import('@anthropic/capacitor-health');
+            const { CapacitorHealthkit } = await import('@perfood/capacitor-healthkit');
             const startDate = new Date();
             startDate.setDate(startDate.getDate() - (daysBack || 30));
 
-            const { workouts } = await CapacitorHealth.queryWorkouts({
+            const result = await CapacitorHealthkit.queryHKitSampleType({
+                sampleName: 'workoutType',
                 startDate: startDate.toISOString(),
                 endDate: new Date().toISOString(),
-                activityTypes: ['waterSports', 'surfingSports', 'sailing', 'paddleSports'],
+                limit: 0,
             });
 
+            const workouts = result.resultData || [];
+
             return {
-                sessions: (workouts || []).map(w => ({
+                sessions: workouts.map(w => ({
                     date: new Date(w.startDate).toISOString().split('T')[0],
                     time: new Date(w.startDate).toTimeString().slice(0, 5),
                     duration: Math.round((new Date(w.endDate) - new Date(w.startDate)) / 60000),

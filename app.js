@@ -1958,6 +1958,18 @@
         if (!localStorage.getItem('aero_onboarded')) {
             showOnboarding();
         }
+
+        // Hide native splash screen once the web app is ready
+        hideSplashScreen();
+    }
+
+    async function hideSplashScreen() {
+        try {
+            const { SplashScreen } = await import('@capacitor/splash-screen');
+            await SplashScreen.hide({ fadeOutDuration: 500 });
+        } catch (_) {
+            // Not running in Capacitor native shell — ignore
+        }
     }
 
     // Expose session count check for paywall integration
