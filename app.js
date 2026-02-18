@@ -48,30 +48,77 @@
 
     // ─── Achievement Definitions ─────────────────────────────
     const ACHIEVEMENTS = [
+        // ── Session Count ─────────────────────────────────────
         { id: 'first_session', name: 'First Splash', desc: 'Log your first session', icon: '\u{1F4A7}', check: (s) => s.length >= 1 },
         { id: 'five_sessions', name: 'Getting Hooked', desc: 'Log 5 sessions', icon: '\u{1FA9D}', check: (s) => s.length >= 5 },
         { id: 'ten_sessions', name: 'Regular Rider', desc: 'Log 10 sessions', icon: '\u{1F30A}', check: (s) => s.length >= 10 },
         { id: 'twenty_five', name: 'Committed', desc: 'Log 25 sessions', icon: '\u{1F3C6}', check: (s) => s.length >= 25 },
         { id: 'fifty_sessions', name: 'Half Century', desc: 'Log 50 sessions', icon: '\u{1F451}', check: (s) => s.length >= 50 },
         { id: 'hundred', name: 'Centurion', desc: 'Log 100 sessions', icon: '\u{1F4AF}', check: (s) => s.length >= 100 },
+        { id: 'two_fifty', name: 'Relentless', desc: 'Log 250 sessions', icon: '\u{1F9BF}', check: (s) => s.length >= 250 },
+        { id: 'five_hundred', name: 'Lifer', desc: 'Log 500 sessions', icon: '\u{1F48E}', check: (s) => s.length >= 500 },
+
+        // ── Sport Variety ─────────────────────────────────────
         { id: 'multi_sport', name: 'Versatile', desc: 'Try 2+ different sports', icon: '\u{1F3AF}', check: (s) => new Set(s.map(x => x.sport)).size >= 2 },
         { id: 'all_sports', name: 'Renaissance', desc: 'Try all 4 sports', icon: '\u{1F308}', check: (s) => new Set(s.map(x => x.sport)).size >= 4 },
+
+        // ── Wind ──────────────────────────────────────────────
+        { id: 'solid_wind', name: 'Powered Up', desc: 'Session in 20+ knots', icon: '\u{1F4A8}', check: (s) => s.some(x => x.windSpeed >= 20) },
         { id: 'strong_wind', name: 'Storm Chaser', desc: 'Session in 30+ knots', icon: '\u26A1', check: (s) => s.some(x => x.windSpeed >= 30) },
         { id: 'gale_force', name: 'Gale Force', desc: 'Session in 40+ knots', icon: '\u{1F32A}\uFE0F', check: (s) => s.some(x => x.windSpeed >= 40) },
-        { id: 'long_session', name: 'Marathon', desc: '3+ hour session', icon: '\u23F1\uFE0F', check: (s) => s.some(x => x.duration >= 180) },
+        { id: 'hurricane', name: 'Hurricane', desc: 'Session in 50+ knots', icon: '\u{1F300}', check: (s) => s.some(x => x.windSpeed >= 50) },
+
+        // ── Speed ─────────────────────────────────────────────
+        { id: 'speed_demon', name: 'Speed Demon', desc: 'Hit 25+ knots max speed', icon: '\u{1F3CE}\uFE0F', check: (s) => s.some(x => (x.maxSpeed || 0) >= 25) },
+        { id: 'velocity', name: 'Velocity', desc: 'Hit 35+ knots max speed', icon: '\u{1F6A8}', check: (s) => s.some(x => (x.maxSpeed || 0) >= 35) },
+        { id: 'mach_one', name: 'Mach One', desc: 'Hit 45+ knots max speed', icon: '\u{1F525}', check: (s) => s.some(x => (x.maxSpeed || 0) >= 45) },
+
+        // ── Single Session Distance ───────────────────────────
         { id: 'big_distance', name: 'Explorer', desc: 'Cover 10+ miles in one session', icon: '\u{1F9ED}', check: (s) => s.some(x => (x.distance || 0) >= 10) },
-        { id: 'early_bird', name: 'Dawn Patrol', desc: 'Start before 7am', icon: '\u{1F305}', check: (s) => s.some(x => x.time && parseInt(x.time.split(':')[0]) < 7) },
-        { id: 'night_rider', name: 'Sunset Session', desc: 'Start after 6pm', icon: '\u{1F307}', check: (s) => s.some(x => x.time && parseInt(x.time.split(':')[0]) >= 18) },
+        { id: 'long_haul', name: 'Long Haul', desc: 'Cover 25+ miles in one session', icon: '\u{1F6F6}', check: (s) => s.some(x => (x.distance || 0) >= 25) },
+        { id: 'ultra_distance', name: 'Ultra', desc: 'Cover 50+ miles in one session', icon: '\u{1F30D}', check: (s) => s.some(x => (x.distance || 0) >= 50) },
+
+        // ── Total Distance ────────────────────────────────────
+        { id: 'distance_50', name: 'Road Warrior', desc: '50 total miles', icon: '\u{1F6E3}\uFE0F', check: (s) => s.reduce((a, x) => a + (x.distance || 0), 0) >= 50 },
+        { id: 'distance_100', name: 'Century Miles', desc: '100 total miles', icon: '\u{1F3D6}\uFE0F', check: (s) => s.reduce((a, x) => a + (x.distance || 0), 0) >= 100 },
+        { id: 'distance_500', name: 'Iron Rider', desc: '500 total miles', icon: '\u{1F6A2}', check: (s) => s.reduce((a, x) => a + (x.distance || 0), 0) >= 500 },
+        { id: 'distance_1000', name: 'Thousand Miler', desc: '1,000 total miles', icon: '\u{1F30F}', check: (s) => s.reduce((a, x) => a + (x.distance || 0), 0) >= 1000 },
+
+        // ── Session Duration ──────────────────────────────────
+        { id: 'long_session', name: 'Marathon', desc: '3+ hour session', icon: '\u23F1\uFE0F', check: (s) => s.some(x => x.duration >= 180) },
+        { id: 'ultra_session', name: 'Ultramarathon', desc: '5+ hour session', icon: '\u{1F9D8}', check: (s) => s.some(x => x.duration >= 300) },
+
+        // ── Total Hours ───────────────────────────────────────
+        { id: 'hours_50', name: '50 Hours', desc: '50 total hours on the water', icon: '\u23F3', check: (s) => s.reduce((a, x) => a + (x.duration || 0), 0) >= 3000 },
+        { id: 'hours_100', name: 'Triple Digits', desc: '100 total hours on the water', icon: '\u{1F4AA}', check: (s) => s.reduce((a, x) => a + (x.duration || 0), 0) >= 6000 },
+        { id: 'hours_500', name: 'Water Logged', desc: '500 total hours on the water', icon: '\u{1F3CA}', check: (s) => s.reduce((a, x) => a + (x.duration || 0), 0) >= 30000 },
+        { id: 'hours_1000', name: '1K Hours', desc: '1,000 total hours on the water', icon: '\u{1F9DC}', check: (s) => s.reduce((a, x) => a + (x.duration || 0), 0) >= 60000 },
+
+        // ── Jumps / Air ───────────────────────────────────────
+        { id: 'ten_jumps', name: 'Bouncy', desc: '10+ jumps in one session', icon: '\u{1F3C3}', check: (s) => s.some(x => (x.jumpCount || 0) >= 10) },
         { id: 'big_air', name: 'Big Air', desc: 'Jump over 5 meters', icon: '\u{1F680}', check: (s) => s.some(x => (x.maxJumpHeight || 0) > 5) },
         { id: 'mega_air', name: 'Mega Air', desc: 'Jump over 10 meters', icon: '\u{1FA82}', check: (s) => s.some(x => (x.maxJumpHeight || 0) > 10) },
-        { id: 'ten_jumps', name: 'Bouncy', desc: '10+ jumps in one session', icon: '\u{1F3C3}', check: (s) => s.some(x => (x.jumpCount || 0) >= 10) },
-        { id: 'perfect_rating', name: 'Legendary Day', desc: 'Rate a session 5/5', icon: '\u2B50', check: (s) => s.some(x => x.rating === 5) },
-        { id: 'speed_demon', name: 'Speed Demon', desc: 'Hit 25+ knots max speed', icon: '\u{1F3CE}\uFE0F', check: (s) => s.some(x => (x.maxSpeed || 0) >= 25) },
-        { id: 'three_spots', name: 'Spot Collector', desc: 'Ride 3 different spots', icon: '\u{1F4CD}', check: (s) => new Set(s.filter(x => x.spot).map(x => x.spot)).size >= 3 },
+        { id: 'stratosphere', name: 'Stratosphere', desc: 'Jump over 15 meters', icon: '\u{1F6F8}', check: (s) => s.some(x => (x.maxJumpHeight || 0) > 15) },
+
+        // ── Streaks ───────────────────────────────────────────
         { id: 'weekly_streak', name: '7-Day Streak', desc: 'Ride 7 days in a row', icon: '\u{1F525}', check: (s) => calcMaxStreak(s) >= 7 },
+        { id: 'two_week_streak', name: 'Fortnight', desc: 'Ride 14 days in a row', icon: '\u{1F525}\u{1F525}', check: (s) => calcMaxStreak(s) >= 14 },
+        { id: 'monthly_streak', name: 'Iron Will', desc: 'Ride 30 days in a row', icon: '\u{1F525}\u{1F525}\u{1F525}', check: (s) => calcMaxStreak(s) >= 30 },
+
+        // ── Monthly Volume ────────────────────────────────────
         { id: 'monthly_ten', name: 'Month of Wind', desc: '10 sessions in a month', icon: '\u{1F4C5}', check: (s) => checkMonthlyCount(s, 10) },
-        { id: 'distance_50', name: 'Road Warrior', desc: '50 total miles', icon: '\u{1F6E3}\uFE0F', check: (s) => s.reduce((a, x) => a + (x.distance || 0), 0) >= 50 },
-        { id: 'distance_100', name: 'Century Miles', desc: '100 total miles', icon: '\u{1F30D}', check: (s) => s.reduce((a, x) => a + (x.distance || 0), 0) >= 100 },
+        { id: 'monthly_twenty', name: 'Obsessed', desc: '20 sessions in a month', icon: '\u{1F4C6}', check: (s) => checkMonthlyCount(s, 20) },
+
+        // ── Spots ─────────────────────────────────────────────
+        { id: 'three_spots', name: 'Spot Collector', desc: 'Ride 3 different spots', icon: '\u{1F4CD}', check: (s) => new Set(s.filter(x => x.spot).map(x => x.spot)).size >= 3 },
+        { id: 'ten_spots', name: 'Nomad', desc: 'Ride 10 different spots', icon: '\u{1F5FA}\uFE0F', check: (s) => new Set(s.filter(x => x.spot).map(x => x.spot)).size >= 10 },
+
+        // ── Time of Day ───────────────────────────────────────
+        { id: 'early_bird', name: 'Dawn Patrol', desc: 'Start before 7am', icon: '\u{1F305}', check: (s) => s.some(x => x.time && parseInt(x.time.split(':')[0]) < 7) },
+        { id: 'night_rider', name: 'Sunset Session', desc: 'Start after 6pm', icon: '\u{1F307}', check: (s) => s.some(x => x.time && parseInt(x.time.split(':')[0]) >= 18) },
+
+        // ── Rating ────────────────────────────────────────────
+        { id: 'perfect_rating', name: 'Legendary Day', desc: 'Rate a session 5/5', icon: '\u2B50', check: (s) => s.some(x => x.rating === 5) },
     ];
 
     // ─── State ───────────────────────────────────────────────
