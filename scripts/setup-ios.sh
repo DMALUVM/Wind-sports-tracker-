@@ -64,13 +64,12 @@ cat > "$ENTITLEMENTS" << 'ENTITLEMENTS_EOF'
 	<true/>
 	<key>com.apple.developer.healthkit.access</key>
 	<array/>
+	<key>com.apple.developer.healthkit.background-delivery</key>
+	<true/>
 </dict>
 </plist>
 ENTITLEMENTS_EOF
-
-# Safety: explicitly remove background-delivery if the HealthKit plugin injected it
-/usr/libexec/PlistBuddy -c "Delete :com.apple.developer.healthkit.background-delivery" "$ENTITLEMENTS" 2>/dev/null || true
-echo "    ✓ Ensured no background-delivery entitlement"
+echo "    ✓ HealthKit entitlements set (including background-delivery)"
 
 # ──────────────────────────────────────────────────────────
 # 5. Set Background Modes (for HealthKit if needed later)
@@ -98,11 +97,7 @@ if [ -f "$PBXPROJ" ]; then
         echo "    ✓ Entitlements already linked"
     fi
 
-    # Remove HealthKit background delivery from SystemCapabilities if plugin added it
-    if grep -q "com.apple.BackgroundModes" "$PBXPROJ"; then
-        sed -i '' '/com.apple.BackgroundModes/,/};/d' "$PBXPROJ"
-        echo "    ✓ Removed BackgroundModes from SystemCapabilities"
-    fi
+    echo "    ✓ HealthKit background-delivery entitlement included"
 fi
 
 # ──────────────────────────────────────────────────────────
@@ -119,10 +114,9 @@ echo "Next steps in Xcode:"
 echo "  1. Open ios/App/App.xcworkspace"
 echo "  2. Select the 'App' target → Signing & Capabilities"
 echo "  3. Select your Team / Apple Developer account"
-echo "  4. If HealthKit shows 'Background Delivery' checked, UNCHECK it"
-echo "  5. Verify 'HealthKit' appears under Capabilities"
+echo "  4. Verify 'HealthKit' appears under Capabilities"
 echo "     (If not: + Capability → search 'HealthKit' → add it)"
-echo "  6. Product → Clean Build Folder (Cmd+Shift+K)"
-echo "  7. Product → Archive"
-echo "  8. Distribute App → TestFlight (App Store Connect)"
+echo "  5. Product → Clean Build Folder (Cmd+Shift+K)"
+echo "  6. Product → Archive"
+echo "  7. Distribute App → TestFlight (App Store Connect)"
 echo ""
