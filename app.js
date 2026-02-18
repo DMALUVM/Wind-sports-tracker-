@@ -117,6 +117,12 @@
     function $$(sel) { return document.querySelectorAll(sel); }
     function uuid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        return String(str).replace(/[&<>"']/g, c => map[c]);
+    }
+
     function formatDate(dateStr) {
         const d = new Date(dateStr + 'T00:00:00');
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -135,6 +141,36 @@
     }
 
     function todayStr() { return toDateStr(new Date()); }
+
+    // ─── Unit Conversion ──────────────────────────────────────
+    function distLabel() { return state.settings.unit || 'mi'; }
+    function windLabel() { return state.settings.windUnit || 'kts'; }
+
+    function convertDist(miles) {
+        if (!miles) return 0;
+        const unit = state.settings.unit || 'mi';
+        if (unit === 'km') return miles * 1.60934;
+        if (unit === 'nm') return miles * 0.868976;
+        return miles;
+    }
+
+    function convertWind(knots) {
+        if (!knots) return 0;
+        const unit = state.settings.windUnit || 'kts';
+        if (unit === 'mph') return knots * 1.15078;
+        if (unit === 'kmh') return knots * 1.852;
+        if (unit === 'ms') return knots * 0.514444;
+        return knots;
+    }
+
+    function fmtDist(miles, decimals) {
+        const d = decimals !== undefined ? decimals : 1;
+        return convertDist(miles).toFixed(d);
+    }
+
+    function fmtWind(knots) {
+        return Math.round(convertWind(knots));
+    }
 
     function durationLabel(mins) {
         if (mins < 60) return `${mins}m`;
@@ -227,7 +263,7 @@
         const hour = new Date().getHours();
         const name = state.settings.name;
         let greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-        if (name) greet += `, ${name}`;
+        if (name) greet += `, ${escapeHtml(name)}`;
         $('.greeting-text').textContent = greet;
         const subs = [
             'Ready to chase the wind?',
@@ -236,17 +272,33 @@
             'Time to send it!',
             'Let the wind guide you.',
         ];
-        $('.greeting-sub').textContent = subs[Math.floor(Math.random() * subs.length)];
+        // Stable subtitle based on day-of-year so it doesn't flicker on re-render
+        const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        $('.greeting-sub').textContent = subs[dayOfYear % subs.length];
 
         // Stats
         const sessions = state.sessions;
-        const totalDist = sessions.reduce((a, s) => a + (s.distance || 0), 0);
+        const totalDistMi = sessions.reduce((a, s) => a + (s.distance || 0), 0);
         const totalHours = sessions.reduce((a, s) => a + (s.duration || 0), 0) / 60;
         const streak = calcCurrentStreak(sessions);
         $('#stat-sessions').textContent = sessions.length;
-        $('#stat-distance').textContent = totalDist.toFixed(1);
+        $('#stat-distance').textContent = fmtDist(totalDistMi);
         $('#stat-hours').textContent = totalHours.toFixed(1);
         $('#stat-streak').textContent = streak;
+        // Update distance label to match unit setting
+        const distStatLabel = document.querySelector('#stat-distance')
+            .closest('.stat-card').querySelector('.stat-label');
+        if (distStatLabel) distStatLabel.textContent = distLabel() === 'km' ? 'Kilometers' : distLabel() === 'nm' ? 'Nautical Mi' : 'Miles';
+
+        // Wind indicator - show last session's wind or hide
+        const windIndicator = $('#wind-indicator');
+        const lastWithWind = [...sessions].reverse().find(s => s.windSpeed > 0);
+        if (lastWithWind) {
+            windIndicator.style.display = '';
+            $('#wind-speed-display').textContent = fmtWind(lastWithWind.windSpeed) + ' ' + windLabel();
+        } else {
+            windIndicator.style.display = 'none';
+        }
 
         // Recent Sessions
         renderRecentSessions();
@@ -304,8 +356,8 @@
                     </div>
                     <div class="session-info-bottom">
                         ${s.duration ? `<span class="session-meta">${durationLabel(s.duration)}</span>` : ''}
-                        ${s.windSpeed ? `<span class="session-meta">${s.windSpeed}kts</span>` : ''}
-                        ${s.distance ? `<span class="session-meta">${s.distance}mi</span>` : ''}
+                        ${s.windSpeed ? `<span class="session-meta">${fmtWind(s.windSpeed)} ${windLabel()}</span>` : ''}
+                        ${s.distance ? `<span class="session-meta">${fmtDist(s.distance)} ${distLabel()}</span>` : ''}
                         <span class="session-rating">${ratingDots}</span>
                     </div>
                 </div>
@@ -421,7 +473,7 @@
 
         const values = months.map(m => {
             const monthSessions = state.sessions.filter(s => s.date.startsWith(m.key));
-            if (chartMetric === 'distance') return monthSessions.reduce((a, s) => a + (s.distance || 0), 0);
+            if (chartMetric === 'distance') return convertDist(monthSessions.reduce((a, s) => a + (s.distance || 0), 0));
             if (chartMetric === 'sessions') return monthSessions.length;
             if (chartMetric === 'hours') return monthSessions.reduce((a, s) => a + (s.duration || 0), 0) / 60;
             return 0;
@@ -554,6 +606,14 @@
         const dateInput = $('#session-date');
         if (!dateInput.value) dateInput.value = todayStr();
 
+        // Update form labels to match unit settings
+        const wl = windLabel();
+        const dl = distLabel();
+        document.querySelector('label[for="wind-speed"]').textContent = `Wind Speed (${wl})`;
+        document.querySelector('label[for="wind-gusts"]').textContent = `Gusts (${wl})`;
+        document.querySelector('label[for="session-distance"]').textContent = `Distance (${dl})`;
+        document.querySelector('label[for="max-speed"]').textContent = `Max Speed (${wl})`;
+
         // Populate spot dropdown
         populateSpotDropdown();
         populateEquipmentDropdown();
@@ -680,6 +740,8 @@
         const ratingLabel = RATING_LABELS[session.rating] || '--';
 
         $('#session-detail-title').textContent = `${SPORT_EMOJIS[session.sport] || ''} ${sportLabel} - ${formatDate(session.date)}`;
+        const wl = windLabel();
+        const dl = distLabel();
         $('#session-detail-content').innerHTML = `
             <div class="session-detail-grid">
                 <div class="detail-item">
@@ -692,7 +754,7 @@
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Wind Speed</div>
-                    <div class="detail-value">${session.windSpeed || '--'} kts${session.windGusts ? ` (G${session.windGusts})` : ''}</div>
+                    <div class="detail-value">${session.windSpeed ? fmtWind(session.windSpeed) + ' ' + wl : '--'}${session.windGusts ? ` (G${fmtWind(session.windGusts)})` : ''}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Direction</div>
@@ -700,11 +762,11 @@
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Distance</div>
-                    <div class="detail-value">${session.distance ? session.distance + ' mi' : '--'}</div>
+                    <div class="detail-value">${session.distance ? fmtDist(session.distance) + ' ' + dl : '--'}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Max Speed</div>
-                    <div class="detail-value">${session.maxSpeed ? session.maxSpeed + ' kts' : '--'}</div>
+                    <div class="detail-value">${session.maxSpeed ? fmtWind(session.maxSpeed) + ' ' + wl : '--'}</div>
                 </div>
                 ${session.jumpCount ? `
                 <div class="detail-item">
@@ -731,16 +793,16 @@
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Spot</div>
-                    <div class="detail-value">${spotObj ? spotObj.name : '--'}</div>
+                    <div class="detail-value">${spotObj ? escapeHtml(spotObj.name) : '--'}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Equipment</div>
-                    <div class="detail-value">${eqObj ? eqObj.name : '--'}</div>
+                    <div class="detail-value">${eqObj ? escapeHtml(eqObj.name) : '--'}</div>
                 </div>
                 ${session.notes ? `
                 <div class="detail-notes full-width">
                     <div class="detail-label">Notes</div>
-                    <p>${session.notes}</p>
+                    <p>${escapeHtml(session.notes)}</p>
                 </div>` : ''}
             </div>`;
 
@@ -836,9 +898,9 @@
                 <div class="equipment-item">
                     <div class="eq-type-icon ${eq.type}">${emoji}</div>
                     <div class="eq-info">
-                        <div class="eq-name">${eq.name}</div>
-                        ${meta ? `<div class="eq-meta">${meta}</div>` : ''}
-                        ${eq.notes ? `<div class="eq-meta">${eq.notes}</div>` : ''}
+                        <div class="eq-name">${escapeHtml(eq.name)}</div>
+                        ${meta ? `<div class="eq-meta">${escapeHtml(meta)}</div>` : ''}
+                        ${eq.notes ? `<div class="eq-meta">${escapeHtml(eq.notes)}</div>` : ''}
                     </div>
                     <div class="eq-actions">
                         <button class="icon-btn" data-eq-delete="${eq.id}" title="Delete">
@@ -882,15 +944,15 @@
                     <div class="spot-header">
                         <div class="spot-name">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            ${sp.name}
+                            ${escapeHtml(sp.name)}
                         </div>
                         <button class="icon-btn" data-spot-delete="${sp.id}" title="Delete">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                         </button>
                     </div>
-                    ${sp.location ? `<div class="spot-location">${sp.location}</div>` : ''}
+                    ${sp.location ? `<div class="spot-location">${escapeHtml(sp.location)}</div>` : ''}
                     ${tags.length ? `<div class="spot-tags">${tags.map(t => `<span class="spot-tag">${t}</span>`).join('')}</div>` : ''}
-                    ${sp.notes ? `<div class="spot-location" style="margin-top:6px">${sp.notes}</div>` : ''}
+                    ${sp.notes ? `<div class="spot-location" style="margin-top:6px">${escapeHtml(sp.notes)}</div>` : ''}
                 </div>`;
         }).join('');
 
@@ -921,11 +983,11 @@
 
         // Max wind
         const maxWind = sessions.reduce((max, s) => s.windSpeed > (max.windSpeed || 0) ? s : max, {});
-        if (maxWind.windSpeed) records.push({ label: 'Max Wind', value: maxWind.windSpeed + ' kts', date: maxWind.date });
+        if (maxWind.windSpeed) records.push({ label: 'Max Wind', value: fmtWind(maxWind.windSpeed) + ' ' + windLabel(), date: maxWind.date });
 
         // Max speed
         const maxSpd = sessions.reduce((max, s) => (s.maxSpeed || 0) > (max.maxSpeed || 0) ? s : max, {});
-        if (maxSpd.maxSpeed) records.push({ label: 'Max Speed', value: maxSpd.maxSpeed + ' kts', date: maxSpd.date });
+        if (maxSpd.maxSpeed) records.push({ label: 'Max Speed', value: fmtWind(maxSpd.maxSpeed) + ' ' + windLabel(), date: maxSpd.date });
 
         // Longest session
         const longest = sessions.reduce((max, s) => (s.duration || 0) > (max.duration || 0) ? s : max, {});
@@ -933,7 +995,7 @@
 
         // Max distance
         const maxDist = sessions.reduce((max, s) => (s.distance || 0) > (max.distance || 0) ? s : max, {});
-        if (maxDist.distance) records.push({ label: 'Max Distance', value: maxDist.distance + ' mi', date: maxDist.date });
+        if (maxDist.distance) records.push({ label: 'Max Distance', value: fmtDist(maxDist.distance) + ' ' + distLabel(), date: maxDist.date });
 
         // Max jump
         const maxJump = sessions.reduce((max, s) => (s.maxJumpHeight || 0) > (max.maxJumpHeight || 0) ? s : max, {});
@@ -945,7 +1007,7 @@
 
         // Total distance
         const totalDist = sessions.reduce((a, s) => a + (s.distance || 0), 0);
-        records.push({ label: 'Total Distance', value: totalDist.toFixed(1) + ' mi', date: '' });
+        records.push({ label: 'Total Distance', value: fmtDist(totalDist) + ' ' + distLabel(), date: '' });
 
         // Total sessions
         records.push({ label: 'Total Sessions', value: sessions.length.toString(), date: '' });
@@ -1373,13 +1435,67 @@
         });
     }
 
-    // ─── Init ────────────────────────────────────────────────
+    // ─── Onboarding ──────────────────────────────────────────
+    function showOnboarding() {
+        const overlay = $('#onboarding');
+        overlay.style.display = 'flex';
+        let currentSlide = 0;
+        const totalSlides = 5;
+
+        function updateSlide() {
+            $$('.onboarding-slide').forEach(s => s.classList.remove('active'));
+            $$('.onboarding-dot').forEach(d => d.classList.remove('active'));
+            const slide = $(`.onboarding-slide[data-slide="${currentSlide}"]`);
+            const dot = $(`.onboarding-dot[data-dot="${currentSlide}"]`);
+            if (slide) slide.classList.add('active');
+            if (dot) dot.classList.add('active');
+
+            const nextBtn = $('#onboarding-next');
+            const skipBtn = $('#onboarding-skip');
+            if (currentSlide === totalSlides - 1) {
+                nextBtn.textContent = "Let's Go!";
+                skipBtn.style.display = 'none';
+            } else {
+                nextBtn.textContent = 'Next';
+                skipBtn.style.display = '';
+            }
+        }
+
+        function finishOnboarding() {
+            const name = ($('#onboarding-name').value || '').trim();
+            if (name) {
+                state.settings.name = name;
+                $('#setting-name').value = name;
+                save();
+            }
+            localStorage.setItem('aero_onboarded', '1');
+            overlay.style.display = 'none';
+            renderDashboard();
+        }
+
+        $('#onboarding-next').addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            } else {
+                finishOnboarding();
+            }
+        });
+
+        $('#onboarding-skip').addEventListener('click', finishOnboarding);
+        updateSlide();
+    }
+
     function init() {
         load();
         bindEvents();
         initWindParticles();
         navigateTo('dashboard');
         checkAchievements();
+        // Show onboarding for first-time users
+        if (!localStorage.getItem('aero_onboarded')) {
+            showOnboarding();
+        }
     }
 
     // Start

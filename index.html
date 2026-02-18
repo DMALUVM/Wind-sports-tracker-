@@ -742,6 +742,69 @@
         </div>
     </div>
 
+    <!-- Onboarding Overlay -->
+    <div class="onboarding-overlay" id="onboarding" style="display:none">
+        <div class="onboarding-card">
+            <svg class="onboarding-logo" viewBox="0 0 32 32" fill="none">
+                <path d="M16 2C16 2 28 8 28 18C28 24.627 22.627 30 16 30C9.373 30 4 24.627 4 18C4 8 16 2 16 2Z" fill="url(#onbGrad)" opacity="0.9"/>
+                <path d="M16 6C16 6 8 14 8 20C8 24.418 11.582 28 16 28" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none"/>
+                <path d="M16 6C16 6 24 14 24 20C24 24.418 20.418 28 16 28" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none"/>
+                <path d="M12 16L16 10L20 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M16 10V24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <defs>
+                    <linearGradient id="onbGrad" x1="4" y1="2" x2="28" y2="30">
+                        <stop offset="0%" stop-color="#00b4ff"/>
+                        <stop offset="100%" stop-color="#7c3aed"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1 class="onboarding-title">AERO</h1>
+            <p class="onboarding-subtitle">Your wind sports companion</p>
+
+            <div class="onboarding-slides">
+                <div class="onboarding-slide active" data-slide="0">
+                    <div class="onboarding-slide-icon">&#x1FA81;</div>
+                    <h3>Log Every Session</h3>
+                    <p>Track wind, waves, gear, jumps, and how you felt. Tap the <strong>+</strong> button anytime to log a session.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="1">
+                    <div class="onboarding-slide-icon">&#x1F4C5;</div>
+                    <h3>Calendar View</h3>
+                    <p>See your session history at a glance. Days with sessions light up so you can spot your streaks.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="2">
+                    <div class="onboarding-slide-icon">&#x1F3C6;</div>
+                    <h3>Earn Achievements</h3>
+                    <p>Unlock badges as you progress &mdash; from your first splash to storm chasing at 40+ knots.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="3">
+                    <div class="onboarding-slide-icon">&#x2699;&#xFE0F;</div>
+                    <h3>Your Quiver</h3>
+                    <p>Save your gear, favorite spots, and track personal records all in one place.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="4">
+                    <div class="onboarding-slide-icon">&#x1F44B;</div>
+                    <h3>What's your name?</h3>
+                    <p>So we can personalize your dashboard.</p>
+                    <input type="text" class="onboarding-name-input" id="onboarding-name" placeholder="Your name (optional)">
+                </div>
+            </div>
+
+            <div class="onboarding-dots" id="onboarding-dots">
+                <div class="onboarding-dot active" data-dot="0"></div>
+                <div class="onboarding-dot" data-dot="1"></div>
+                <div class="onboarding-dot" data-dot="2"></div>
+                <div class="onboarding-dot" data-dot="3"></div>
+                <div class="onboarding-dot" data-dot="4"></div>
+            </div>
+
+            <div class="onboarding-actions">
+                <button class="onboarding-btn secondary" id="onboarding-skip">Skip</button>
+                <button class="onboarding-btn primary" id="onboarding-next">Next</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast notifications -->
     <div id="toast-container" class="toast-container"></div>
 
